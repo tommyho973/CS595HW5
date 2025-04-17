@@ -1,0 +1,12 @@
+Deposit Verifier Contract Hash: "0x47c9Fb923a43eD7612848C1132Fb21e9C43Cb08b"
+Withdraw Verifier Contract Hash: "0xc9924dc96397369B121001fc740D5E63470Ea537"
+Whirlwind Contract Hash : "0x77169b42aE8df3cbD56e000931B746834531aD93"
+Deposit Transaction Hash: 0x8292405611ea305d12f8417bad5c06275e654b5125511d5c6e49629af5a2bf11
+Withdraw Transaction Hash: 0x02f00d1b5ea465d297501f3ab1c13f2ac6bdac346f525388fb6653494950e75b
+Deployment Script (Deposit): 
+echo "[\"0x$(od -An -v -t x1 ./target/proof | tr -d ' \n' | sed 's/^.\{8\}//' | cut -c1-256)\"]"
+echo "\"0x$(od -An -v -t x1 ./target/proof | tr -d ' \n' | sed 's/^.\{264\}//')\""
+Deployment Script (Withdraw): 
+echo "[\"0x$(od -An -v -t x1 ./target/proof | tr -d ' \n' | sed 's/^.\{8\}//' | cut -c1-128)\"]"
+echo "\"0x$(od -An -v -t x1 ./target/proof | tr -d ' \n' | sed 's/^.\{136\}//')\""
+
