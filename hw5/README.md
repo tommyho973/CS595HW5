@@ -48,7 +48,7 @@ Below is the provided contract:
 pragma solidity ^0.8.0;
 
 interface IVerifier {
-    function verify(bytes calldata proof, bytes calldata publicInputs) external view returns (bool);
+    function verify(bytes calldata proof, bytes32[] calldata publicInputs) external view returns (bool);
 }
 
 contract Whirlwind {
@@ -80,7 +80,14 @@ contract Whirlwind {
     // Deposit function uses the internal depositIndex and checks against maxDeposits
     function deposit(bytes calldata proof, bytes32 newRoot, bytes32 commitment) external payable {
         require(depositIndex < maxDeposits, "Deposit limit reached");
-        bytes memory publicInputs = abi.encodePacked(commitment, depositIndex, newRoot);
+        // Create a dynamic bytes32 array in memory with 4 elements
+        bytes32[] memory publicInputs = new bytes32[](4);
+
+        publicInputs[0] = currentRoot;
+        publicInputs[1] = newRoot;
+        publicInputs[2] = commitment;
+        publicInputs[3] = bytes32(uint256(depositIndex)); // if depositIndex is uint256
+
         require(msg.value == 0.1 ether, "Must deposit exactly 0.1 ETH");
         require(IVerifier(depositVerifier).verify(proof, publicInputs), "Invalid deposit proof");
 
@@ -89,9 +96,11 @@ contract Whirlwind {
         depositIndex++; // Increment internal deposit index
     }
 
-    function withdraw(bytes calldata proof, bytes32 root, bytes32 nullifier) external {
+    function withdraw(bytes calldata proof, bytes32 nullifier) external {
         require(!usedNullifiers[nullifier], "Nullifier already used");
-        bytes memory publicInputs = abi.encodePacked(root, nullifier);
+        bytes32[] memory publicInputs = new bytes32[](2);
+        publicInputs[0] = currentRoot;
+        publicInputs[1] = nullifier;
         require(IVerifier(withdrawVerifier).verify(proof, publicInputs), "Invalid withdraw proof");
 
         usedNullifiers[nullifier] = true;
@@ -99,7 +108,6 @@ contract Whirlwind {
         payable(msg.sender).transfer(0.1 ether);
     }
 }
-
 ```
 
 ---
